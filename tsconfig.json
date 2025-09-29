@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "rootDir": "src", // location of your .ts/.tsx
+        "outDir": "dist", // output bucket
+        "module": "nodenext", // or "esnext", "nodenext", etc.
+        "target": "es2022",
+        "moduleResolution": "nodenext",
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "allowSyntheticDefaultImports": true,
+        "strict": false,
+        "forceConsistentCasingInFileNames": true,
+        "declaration": true, // emit .d.ts alongside .js (optional)
+        "sourceMap": true, // emit .map files (optional)
+        "esModuleInterop": true, // typical Node convenience,
+        "paths": {
+            "src/*": [
+                "src/*"
+            ],
+        }
+    },
+    "include": [
+        "src"
+    ]
+}
