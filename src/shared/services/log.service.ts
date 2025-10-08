@@ -1,9 +1,14 @@
 import { appendFile, mkdir } from "fs/promises";
 import { Request } from "express";
+import { appendFileSync } from "fs";
 
 interface LogData {
   timestamp?: string;
   request?: string;
+  url?: string;
+  query?: string;
+  body?: string;
+  method?: string;
   response?: string;
   error?: string;
   totalTime?: number;
@@ -30,25 +35,20 @@ export class LogService {
 
   public collect(collectParams: CollectParams) {
     if (collectParams.request) {
-      const requestData = [
-        `${collectParams.request.method} ${collectParams.request.originalUrl}`,
-        `Query: ${JSON.stringify(collectParams.request.query)}`,
-        `Body: ${JSON.stringify(collectParams.request.body)}`,
-      ].join(" | ");
-      this.logData.request = requestData;
+      this.logData.method = collectParams.request.method;
+      this.logData.url = collectParams.request.originalUrl;
+      this.logData.query = JSON.stringify(collectParams.request.query);
+      this.logData.request = JSON.stringify(collectParams.request.body);
     }
     if (collectParams.error) {
       this.logData.error = collectParams.error.toString();
     }
 
     if (collectParams.responseBody != undefined) {
-      if (typeof collectParams.responseBody === "string") {
-        this.logData.response = collectParams.responseBody;
-      }
-      if (typeof collectParams.responseBody === "object") {
-        this.logData.response = JSON.stringify(collectParams.responseBody);
-      }
-      this.logData.response = String(collectParams.responseBody);
+      this.logData.response =
+        typeof collectParams.responseBody === "object"
+          ? JSON.stringify(collectParams.responseBody)
+          : (this.logData.response = String(collectParams.responseBody));
     }
   }
 
@@ -57,8 +57,6 @@ export class LogService {
     this.logData.totalTime = end - this.logData.startTime;
     const log = JSON.stringify(this.logData) + "\n";
 
-    appendFile(this.config.logPath, log).catch((error) => {
-      throw error;
-    });
+    appendFileSync(this.config.logPath, log);
   }
 }
